@@ -151,7 +151,7 @@ class ImageController extends Controller
         $deletedFolder->getName();
 
         if ($request->ajax() || $request->isJson() || $_SERVER["CONTENT_TYPE"] == "application/json") {
-            return response()->json(['status' => 'successul']);
+            return response()->json(['status' => 'successful']);
         } else {
             return redirect()->route('images.index');
         }
