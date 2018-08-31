@@ -1,117 +1,129 @@
 <!doctype html>
 <html lang="{{ app()->getLocale() }}">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Images</title>
+    <title>{!! $image->metadata['name'] !!}</title>
 
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
 
-        <!-- Styles -->
-        <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Raleway', sans-serif;
-                font-weight: 100;
-                height: 100vh;
-                margin: 0;
-            }
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-            .full-height {
-                height: 100vh;
-            }
+    <!-- Styles -->
+    <style>
+    html, body {
+        background-color: #fff;
+        color: #636b6f;
+        font-family: 'Raleway', sans-serif;
+        font-weight: 100;
+        height: 100vh;
+        margin: 0;
+    }
 
-            .flex-center {
-                align-items: center;
-                display: flex;
-                /*justify-content: center;*/
-            }
+    .full-height {
+        height: 100vh;
+    }
 
-            .position-ref {
-                position: relative;
-            }
+    .flex-center {
+        align-items: center;
+        display: flex;
+        /*justify-content: center;*/
+    }
 
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
+    .position-ref {
+        position: relative;
+    }
 
-            .content {
-                text-align: center;
-            }
+    .top-right {
+        position: absolute;
+        right: 10px;
+        top: 18px;
+    }
 
-            .title {
-                font-size: 32px;
-            }
+    .content {
+        text-align: center;
+    }
 
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 12px;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
+    .title {
+        font-size: 32px;
+    }
 
-            .m-b-md {
-                /*margin-bottom: 30px;*/
-            }
-        </style>
-    </head>
+    .links > a {
+        color: #636b6f;
+        padding: 0 25px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .1rem;
+        text-decoration: none;
+        text-transform: uppercase;
+    }
 
-    <body>
-        <div class="flex-center position-ref full-height">
-           
-            <div class="content">
-                <div class="title m-b-md">
-                    {!! $image->name !!}
-                </div>
+    .m-b-md {
+        /*margin-bottom: 30px;*/
+    }
+</style>
+</head>
 
-                <div>
-                    {!! $image->metadata['name'] !!}
-                    <br>
-                    <img src="{!! $image->link !!}" height="100%">
-                    {{-- <a href="{!! $image->link !!}">{!! $image->metadata['name'] !!}</a> --}}
+<body>
+    <div class="flex-center position-ref full-height">
+
+        <div class="container">
+
+            <div class="row">
+                <a href="{{ URL('/images/')}}"> All images</a>
+            </div>
+            
+            <div class="row">
+                <br>
+            </div>
+
+            <div class="row">
+                <img src="{!! $image->link !!}" height="100%">
+            </div>
 
 
-                </div>
+            <div class="row">
 
-                <div>
-                    <form action="{{ URL('/images/'.$image->metadata['name']) }}" method="post" enctype="multipart/form-data">
-                        <input type="file" name="image" id="image">
-                        <br>
-                        <input type="submit" value="Upload New Image" name="submit">
-                        <!-- CSRF Token -->
-                        <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
-                        <input type="hidden" name="_method" value="PUT" />
-                        <!-- ./ csrf token -->
-                    </form>
-                </div>
-
-<div>                           
-    <form id="delete_{!! $image->metadata['name'] !!}" class="form-horizontal" method="post"
-        action="{{ URL('/images/'.$image->metadata['name']) }}"
-        autocomplete="off">
-        <!-- CSRF Token -->
-        <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
-        {{-- <input type="hidden" name="image" value="{{ $news->id }}" /> --}}
-        <input type="hidden" name="_method" value="DELETE" />
-        <!-- ./ csrf token -->
-
-        <button type="submit" class="btn btn-sm btn-danger">
-            <span class="glyphicon glyphicon-trash"></span> Delete 
-        </button>
-    </form>
-</div>
-
+                {!! $image->metadata['name'] !!}
 
             </div>
+
+            <div class="row">
+                <br>
+            </div>
+
+            <div class="row">
+                <form action="{{ URL('/images/'.$image->metadata['name']) }}" method="post" enctype="multipart/form-data">
+                    <input type="file" name="image" id="image">
+                    <input type="submit" value="Upload New Image" name="submit">
+                    <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
+                    <input type="hidden" name="_method" value="PUT" />
+                </form>
+            </div>
+
+            <div class="row">
+                <br>
+            </div>
+
+            <div class="row">                           
+                <form id="delete_{!! $image->metadata['name'] !!}" class="form-horizontal" method="post"
+                    action="{{ URL('/images/'.$image->metadata['name']) }}"
+                    autocomplete="off">
+                    <!-- CSRF Token -->
+                    <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
+                    <input type="hidden" name="_method" value="DELETE" />
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        Delete 
+                    </button>
+                </form>
+            </div>
+
+
         </div>
-    </body>
+    </div>
+</body>
 </html>
