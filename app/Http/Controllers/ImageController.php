@@ -25,20 +25,30 @@ class ImageController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
 
         $listFolderContents = $this->dropbox->listFolder("/");
         $items = $listFolderContents->getItems();
         $ret = [];
+        $json = [];
         foreach ($items as $key => $item) {
             $temporaryLink = $this->dropbox->getTemporaryLink($item->path_lower);
             $file = $temporaryLink->getMetadata();
             $temporaryLink->getLink();
             array_push($ret, $temporaryLink);
+            array_push($json, [
+                'link' => $temporaryLink->link, 
+                'name' => $temporaryLink->metadata['name'],
+                'id' => $temporaryLink->metadata['id'],
+                'path_lower' => $temporaryLink->metadata['path_lower']
+            ]);
         }
 
-// dd($ret);
+        if ($request->ajax() || $request->isJson()) {
+            return response()->json(['data' => $json]);
+        }
+
         return view('index', ['ret' => $ret]);
     }
 
@@ -64,6 +74,15 @@ class ImageController extends Controller
         $dropboxFile = DropboxFile::createByStream("/".$_FILES["image"]["name"], $fileStream);
         $file = $this->dropbox->upload($dropboxFile, "/".$_FILES["image"]["name"], ['autorename' => true]);
         $file->getName();
+
+        // if ($request->ajax() || $request->isJson()) {
+        //     return response()->json(
+        //       "data": {
+        //         "name": $_FILES["image"]["name"]
+        //     }
+        // );
+        // }
+
         return redirect()->route('images.index');
     }
 
@@ -73,9 +92,18 @@ class ImageController extends Controller
      * @param  \App\Image  $image
      * @return \Illuminate\Http\Response
      */
-    public function show($image)
+    public function show(Request $request, $image)
     {
         $file = $this->dropbox->getTemporaryLink("/".$image);
+
+        if ($request->ajax() || $request->isJson()) {
+            return response()->json([
+                "data" => [
+                    "file" => $file
+                ]
+            ]
+        );
+        }
 
         return view('image', ['image' => $file]);
     }
