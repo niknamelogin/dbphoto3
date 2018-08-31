@@ -75,17 +75,12 @@
 
 
                 <div>
-{{--                     <a href="{{ URL('/images/create') }}">
-                        Upload Image
-                    </a> --}}
                     <form action="" method="post" enctype="multipart/form-data">
                         <input type="file" name="image" id="image">
                         <br>
                         <input type="submit" value="Upload Image" name="submit">
                         <!-- CSRF Token -->
                         <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
-                        {{-- <input type="hidden" name="image" value="{{ $news->id }}" /> --}}
-                        {{-- <input type="hidden" name="_method" value="POST" /> --}}
                         <!-- ./ csrf token -->
                     </form>
                 </div>

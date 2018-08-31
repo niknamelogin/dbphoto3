@@ -60,22 +60,11 @@ class ImageController extends Controller
      */
     public function store(Request $request)
     {
-// Automatically create stream through file path
-// $dropboxFile = DropboxFile::createByStream("/Hello-World.txt", $pathToLocalFile);
-// OR
-// Create stream through file stream
         $fileStream = fopen($_FILES["image"]["tmp_name"], DropboxFile::MODE_READ);
         $dropboxFile = DropboxFile::createByStream("/".$_FILES["image"]["name"], $fileStream);
-
         $file = $this->dropbox->upload($dropboxFile, "/".$_FILES["image"]["name"], ['autorename' => true]);
-
-//Uploaded File
         $file->getName();
-
         return redirect()->route('images.index');
-
-        // dd($_FILES);
-        // dd($request);
     }
 
     /**
@@ -111,7 +100,13 @@ class ImageController extends Controller
      */
     public function update(Request $request, $image)
     {
-        //
+        $deletedFolder = $this->dropbox->delete("/".$image);
+        $deletedFolder->getName();
+        $fileStream = fopen($_FILES["image"]["tmp_name"], DropboxFile::MODE_READ);
+        $dropboxFile = DropboxFile::createByStream("/".$image, $fileStream);
+        $file = $this->dropbox->upload($dropboxFile, "/".$image, ['autorename' => true]);
+        $file->getName();
+        return redirect()->route('images.index');
     }
 
     /**
@@ -122,11 +117,8 @@ class ImageController extends Controller
      */
     public function destroy($image)
     {
-// dd($image);
-
         $deletedFolder = $this->dropbox->delete("/".$image);
         $deletedFolder->getName();
-        // dd($deletedFolder);
         return redirect()->route('images.index');
     }
 }

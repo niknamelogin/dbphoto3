@@ -77,10 +77,38 @@
                     {!! $image->metadata['name'] !!}
                     <br>
                     <img src="{!! $image->link !!}" height="100%">
-                    {{-- <a href="{!! $r->link !!}">{!! $r->metadata['name'] !!}</a> --}}
+                    {{-- <a href="{!! $image->link !!}">{!! $image->metadata['name'] !!}</a> --}}
 
 
                 </div>
+
+                <div>
+                    <form action="{{ URL('/images/'.$image->metadata['name']) }}" method="post" enctype="multipart/form-data">
+                        <input type="file" name="image" id="image">
+                        <br>
+                        <input type="submit" value="Upload New Image" name="submit">
+                        <!-- CSRF Token -->
+                        <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
+                        <input type="hidden" name="_method" value="PUT" />
+                        <!-- ./ csrf token -->
+                    </form>
+                </div>
+
+<div>                           
+    <form id="delete_{!! $image->metadata['name'] !!}" class="form-horizontal" method="post"
+        action="{{ URL('/images/'.$image->metadata['name']) }}"
+        autocomplete="off">
+        <!-- CSRF Token -->
+        <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
+        {{-- <input type="hidden" name="image" value="{{ $news->id }}" /> --}}
+        <input type="hidden" name="_method" value="DELETE" />
+        <!-- ./ csrf token -->
+
+        <button type="submit" class="btn btn-sm btn-danger">
+            <span class="glyphicon glyphicon-trash"></span> Delete 
+        </button>
+    </form>
+</div>
 
 
             </div>
