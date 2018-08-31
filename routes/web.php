@@ -15,4 +15,4 @@
 //     return view('welcome');
 // });
 
-Route::resource('/', 'ImageController');
+Route::resource('/images', 'ImageController');

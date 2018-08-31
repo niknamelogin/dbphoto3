@@ -46,7 +46,7 @@
             }
 
             .title {
-                /*font-size: 84px;*/
+                font-size: 32px;
             }
 
             .links > a {
@@ -70,55 +70,20 @@
            
             <div class="content">
                 <div class="title m-b-md">
-                    Images
+                    {!! $image->name !!}
                 </div>
 
-
-<div>
-<a href="{{ URL('/images/create') }}">
-Upload Image
-</a>
-</div>
-
-
                 <div>
-                    <ul>
-                        @foreach($ret as $r)
-                        <li>
-
-                            {{-- <a href="{!! $r->link !!}">{!! $r->metadata['name'] !!}</a> --}}
-                            <a href="{{ URL('/images/'.$r->metadata['name']) }}"><img src="{!! $r->link !!}" height="120px"><br>{!! $r->metadata['name'] !!}</a>
-                            <br>
+                    {!! $image->metadata['name'] !!}
+                    <br>
+                    <img src="{!! $image->link !!}" height="100%">
+                    {{-- <a href="{!! $r->link !!}">{!! $r->metadata['name'] !!}</a> --}}
 
 
-                            <form id="delete_{!! $r->metadata['name'] !!}" class="form-horizontal" method="post"
-                                action="{!! $r->metadata['name'] !!}"
-                                autocomplete="off">
-                                <!-- CSRF Token -->
-                                <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
-                                {{-- <input type="hidden" name="image" value="{{ $news->id }}" /> --}}
-                                <input type="hidden" name="_method" value="DELETE" />
-                                <!-- ./ csrf token -->
-
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <span class="glyphicon glyphicon-trash"></span> Delete
-                                </button>
-
-
-                                @endforeach
-                            </li>
-                        </ul>
-                    </div>
+                </div>
 
 
             </div>
         </div>
-
-<script type="text/javascript">
-    
-
-
-</script>
-
     </body>
 </html>

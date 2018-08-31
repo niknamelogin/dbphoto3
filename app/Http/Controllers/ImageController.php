@@ -9,6 +9,16 @@ use Kunnu\Dropbox\DropboxApp;
 
 class ImageController extends Controller
 {
+
+    private $dropbox;
+
+    public function __construct()
+    {
+        $app = new DropboxApp(env('DROPBOX_CLIENT_ID'), env('DROPBOX_CLIENT_SECRET'), env('DROPBOX_ACCESS_TOKEN'));
+        $db = new Dropbox($app);
+        $this->dropbox = $db;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,26 +27,18 @@ class ImageController extends Controller
     public function index()
     {
 
-        $app = new DropboxApp(env('DROPBOX_CLIENT_ID'), env('DROPBOX_CLIENT_SECRET'), env('DROPBOX_ACCESS_TOKEN'));
-
-        $dropbox = new Dropbox($app);
-
-        $listFolderContents = $dropbox->listFolder("/");
+        $listFolderContents = $this->dropbox->listFolder("/");
         $items = $listFolderContents->getItems();
-        // dd($items);
-
         $ret = [];
         foreach ($items as $key => $item) {
-            $temporaryLink = $dropbox->getTemporaryLink($item->path_lower);
+            $temporaryLink = $this->dropbox->getTemporaryLink($item->path_lower);
             $file = $temporaryLink->getMetadata();
             $temporaryLink->getLink();
             array_push($ret, $temporaryLink);
         }
 
-
+// dd($ret);
         return view('index', ['ret' => $ret]);
-        // dd($ret[0]->metadata);
-
     }
 
     /**
@@ -66,9 +68,11 @@ class ImageController extends Controller
      * @param  \App\Image  $image
      * @return \Illuminate\Http\Response
      */
-    public function show(Image $image)
+    public function show($image)
     {
-        //
+        $file = $this->dropbox->getTemporaryLink("/".$image);
+
+        return view('image', ['image' => $file]);
     }
 
     /**
@@ -100,8 +104,11 @@ class ImageController extends Controller
      * @param  \App\Image  $image
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Image $image)
+    public function destroy($image)
     {
-        //
+        $deletedFolder = $this->dropbox->delete("/".$image);
+        $deletedFolder->getName();
+        // dd($deletedFolder);
+        return redirect()->route('images.index');
     }
 }
