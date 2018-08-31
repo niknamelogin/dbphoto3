@@ -11,7 +11,7 @@ use Kunnu\Dropbox\DropboxFile;
 class ImageController extends Controller
 {
 
-    private $dropbox;
+    protected $dropbox;
 
     public function __construct()
     {
