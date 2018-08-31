@@ -74,11 +74,21 @@
                 </div>
 
 
-<div>
-<a href="{{ URL('/images/create') }}">
-Upload Image
-</a>
-</div>
+                <div>
+{{--                     <a href="{{ URL('/images/create') }}">
+                        Upload Image
+                    </a> --}}
+                    <form action="" method="post" enctype="multipart/form-data">
+                        <input type="file" name="image" id="image">
+                        <br>
+                        <input type="submit" value="Upload Image" name="submit">
+                        <!-- CSRF Token -->
+                        <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
+                        {{-- <input type="hidden" name="image" value="{{ $news->id }}" /> --}}
+                        {{-- <input type="hidden" name="_method" value="POST" /> --}}
+                        <!-- ./ csrf token -->
+                    </form>
+                </div>
 
 
                 <div>
@@ -92,7 +102,7 @@ Upload Image
 
 
                             <form id="delete_{!! $r->metadata['name'] !!}" class="form-horizontal" method="post"
-                                action="{!! $r->metadata['name'] !!}"
+                                action="{{ URL('/images/'.$r->metadata['name']) }}"
                                 autocomplete="off">
                                 <!-- CSRF Token -->
                                 <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
@@ -101,8 +111,9 @@ Upload Image
                                 <!-- ./ csrf token -->
 
                                 <button type="submit" class="btn btn-sm btn-danger">
-                                    <span class="glyphicon glyphicon-trash"></span> Delete
+                                    <span class="glyphicon glyphicon-trash"></span> Delete 
                                 </button>
+                            </form>
 
 
                                 @endforeach

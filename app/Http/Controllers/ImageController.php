@@ -6,6 +6,7 @@ use App\Image;
 use Illuminate\Http\Request;
 use Kunnu\Dropbox\Dropbox;
 use Kunnu\Dropbox\DropboxApp;
+use Kunnu\Dropbox\DropboxFile;
 
 class ImageController extends Controller
 {
@@ -59,7 +60,22 @@ class ImageController extends Controller
      */
     public function store(Request $request)
     {
-        //
+// Automatically create stream through file path
+// $dropboxFile = DropboxFile::createByStream("/Hello-World.txt", $pathToLocalFile);
+// OR
+// Create stream through file stream
+        $fileStream = fopen($_FILES["image"]["tmp_name"], DropboxFile::MODE_READ);
+        $dropboxFile = DropboxFile::createByStream("/".$_FILES["image"]["name"], $fileStream);
+
+        $file = $this->dropbox->upload($dropboxFile, "/".$_FILES["image"]["name"], ['autorename' => true]);
+
+//Uploaded File
+        $file->getName();
+
+        return redirect()->route('images.index');
+
+        // dd($_FILES);
+        // dd($request);
     }
 
     /**
@@ -81,7 +97,7 @@ class ImageController extends Controller
      * @param  \App\Image  $image
      * @return \Illuminate\Http\Response
      */
-    public function edit(Image $image)
+    public function edit($image)
     {
         //
     }
@@ -93,7 +109,7 @@ class ImageController extends Controller
      * @param  \App\Image  $image
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Image $image)
+    public function update(Request $request, $image)
     {
         //
     }
@@ -106,6 +122,8 @@ class ImageController extends Controller
      */
     public function destroy($image)
     {
+// dd($image);
+
         $deletedFolder = $this->dropbox->delete("/".$image);
         $deletedFolder->getName();
         // dd($deletedFolder);
