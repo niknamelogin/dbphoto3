@@ -27,7 +27,6 @@ class ImageController extends Controller
      */
     public function index(Request $request)
     {
-
         $listFolderContents = $this->dropbox->listFolder("/");
         $items = $listFolderContents->getItems();
         $ret = [];
@@ -45,11 +44,11 @@ class ImageController extends Controller
             ]);
         }
 
-        if ($request->ajax() || $request->isJson()) {
-            return response()->json(['data' => $json]);
+        if ($request->ajax() || $request->isJson() || $_SERVER["CONTENT_TYPE"] == "application/json") {
+            return response()->json(['data' => $json, 'token' => \Session::token()]);
+        } else {
+            return view('index', ['ret' => $ret]);
         }
-
-        return view('index', ['ret' => $ret]);
     }
 
     /**
@@ -75,15 +74,11 @@ class ImageController extends Controller
         $file = $this->dropbox->upload($dropboxFile, "/".$_FILES["image"]["name"], ['autorename' => true]);
         $file->getName();
 
-        // if ($request->ajax() || $request->isJson()) {
-        //     return response()->json(
-        //       "data": {
-        //         "name": $_FILES["image"]["name"]
-        //     }
-        // );
-        // }
-
-        return redirect()->route('images.index');
+        if ($request->ajax() || $request->isJson() || $_SERVER["CONTENT_TYPE"] === "application/json") {
+            return response()->json(['data' => $_FILES['image']['name']]);
+        } else {
+            return redirect()->route('images.index');
+        }
     }
 
     /**
@@ -96,16 +91,18 @@ class ImageController extends Controller
     {
         $file = $this->dropbox->getTemporaryLink("/".$image);
 
-        if ($request->ajax() || $request->isJson()) {
-            return response()->json([
-                "data" => [
-                    "file" => $file
+        if ($request->ajax() || $request->isJson() || $_SERVER["CONTENT_TYPE"] == "application/json") {
+            return response()->json(['data' => 
+                [
+                    'link' => $file->link, 
+                    'name' => $file->metadata['name'],
+                    'id' => $file->metadata['id'],
+                    'path_lower' => $file->metadata['path_lower']
                 ]
-            ]
-        );
+            ]);
+        } else {
+            return view('image', ['image' => $file]);
         }
-
-        return view('image', ['image' => $file]);
     }
 
     /**
@@ -134,7 +131,12 @@ class ImageController extends Controller
         $dropboxFile = DropboxFile::createByStream("/".$image, $fileStream);
         $file = $this->dropbox->upload($dropboxFile, "/".$image, ['autorename' => true]);
         $file->getName();
-        return redirect()->route('images.index');
+
+        if ($request->ajax() || $request->isJson() || $_SERVER["CONTENT_TYPE"] == "application/json") {
+            return response()->json(['data' => $_FILES['image']['name']]);
+        } else {
+            return redirect()->route('images.index');
+        }
     }
 
     /**
@@ -143,10 +145,15 @@ class ImageController extends Controller
      * @param  \App\Image  $image
      * @return \Illuminate\Http\Response
      */
-    public function destroy($image)
+    public function destroy(Request $request, $image)
     {
         $deletedFolder = $this->dropbox->delete("/".$image);
         $deletedFolder->getName();
-        return redirect()->route('images.index');
+
+        if ($request->ajax() || $request->isJson() || $_SERVER["CONTENT_TYPE"] == "application/json") {
+            return response()->json(['status' => 'successul']);
+        } else {
+            return redirect()->route('images.index');
+        }
     }
 }
