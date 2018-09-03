@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Kunnu\Dropbox\Dropbox;
 use Kunnu\Dropbox\DropboxApp;
 use Kunnu\Dropbox\DropboxFile;
+use Log;
 
 class ImageController extends Controller
 {
@@ -27,29 +28,29 @@ class ImageController extends Controller
      */
     public function index(Request $request)
     {
-        $listFolderContents = $this->dropbox->listFolder("/");
-        $items = $listFolderContents->getItems();
-        $ret = [];
-        $json = [];
-        foreach ($items as $key => $item) {
-            $temporaryLink = $this->dropbox->getTemporaryLink($item->path_lower);
-            $file = $temporaryLink->getMetadata();
-            $temporaryLink->getLink();
-            array_push($ret, $temporaryLink);
-            array_push($json, [
-                'link' => $temporaryLink->link, 
-                'name' => $temporaryLink->metadata['name'],
-                'id' => $temporaryLink->metadata['id'],
-                'path_lower' => $temporaryLink->metadata['path_lower']
-            ]);
-        }
-
-        if ($request->ajax() || $request->isJson() || $_SERVER["CONTENT_TYPE"] == "application/json") {
-            return response()->json(['data' => $json, 'token' => \Session::token()]);
-        } else {
-            return view('index', ['ret' => $ret]);
-        }
+     $listFolderContents = $this->dropbox->listFolder("/");
+     $items = $listFolderContents->getItems();
+     $ret = [];
+     $json = [];
+     foreach ($items as $key => $item) {
+        $temporaryLink = $this->dropbox->getTemporaryLink($item->path_lower);
+        $file = $temporaryLink->getMetadata();
+        $temporaryLink->getLink();
+        array_push($ret, $temporaryLink);
+        array_push($json, [
+            'link' => $temporaryLink->link, 
+            'name' => $temporaryLink->metadata['name'],
+            'id' => $temporaryLink->metadata['id'],
+            'path_lower' => $temporaryLink->metadata['path_lower']
+        ]);
     }
+
+    if ($request->ajax() || $request->isJson() || $request->wantsJson()) {
+        return response()->json(['data' => $json, 'token' => \Session::token()]);
+    } else {
+        return view('index', ['ret' => $ret]);
+    }
+}
 
     /**
      * Show the form for creating a new resource.
@@ -69,13 +70,14 @@ class ImageController extends Controller
      */
     public function store(Request $request)
     {
-        $fileStream = fopen($_FILES["image"]["tmp_name"], DropboxFile::MODE_READ);
-        $dropboxFile = DropboxFile::createByStream("/".$_FILES["image"]["name"], $fileStream);
-        $file = $this->dropbox->upload($dropboxFile, "/".$_FILES["image"]["name"], ['autorename' => true]);
+        $new_image = $request->image;
+        $fileStream = fopen($new_image, DropboxFile::MODE_READ);
+        $dropboxFile = DropboxFile::createByStream("/".$new_image->getClientOriginalName(), $fileStream);
+        $file = $this->dropbox->upload($dropboxFile, "/".$new_image->getClientOriginalName(), ['autorename' => true]);
         $file->getName();
 
-        if ($request->ajax() || $request->isJson() || $_SERVER["CONTENT_TYPE"] === "application/json") {
-            return response()->json(['data' => $_FILES['image']['name']]);
+        if ($request->ajax() || $request->isJson() || $request->wantsJson()) {
+            return response()->json(['data' => $new_image->getClientOriginalName()]);
         } else {
             return redirect()->route('images.index');
         }
@@ -91,7 +93,7 @@ class ImageController extends Controller
     {
         $file = $this->dropbox->getTemporaryLink("/".$image);
 
-        if ($request->ajax() || $request->isJson() || $_SERVER["CONTENT_TYPE"] == "application/json") {
+        if ($request->ajax() || $request->isJson()) {
             return response()->json(['data' => 
                 [
                     'link' => $file->link, 
@@ -125,15 +127,16 @@ class ImageController extends Controller
      */
     public function update(Request $request, $image)
     {
+        $new_image = $request->image;
         $deletedFolder = $this->dropbox->delete("/".$image);
         $deletedFolder->getName();
-        $fileStream = fopen($_FILES["image"]["tmp_name"], DropboxFile::MODE_READ);
+        $fileStream = fopen($new_image, DropboxFile::MODE_READ);
         $dropboxFile = DropboxFile::createByStream("/".$image, $fileStream);
         $file = $this->dropbox->upload($dropboxFile, "/".$image, ['autorename' => true]);
         $file->getName();
 
-        if ($request->ajax() || $request->isJson() || $_SERVER["CONTENT_TYPE"] == "application/json") {
-            return response()->json(['data' => $_FILES['image']['name']]);
+        if ($request->ajax() || $request->isJson() || $request->wantsJson()) {
+            return response()->json(['data' => $new_image->getClientOriginalName()]);
         } else {
             return redirect()->route('images.index');
         }
@@ -150,7 +153,7 @@ class ImageController extends Controller
         $deletedFolder = $this->dropbox->delete("/".$image);
         $deletedFolder->getName();
 
-        if ($request->ajax() || $request->isJson() || $_SERVER["CONTENT_TYPE"] == "application/json") {
+        if ($request->ajax() || $request->isJson() || $request->wantsJson()) {
             return response()->json(['status' => 'successful']);
         } else {
             return redirect()->route('images.index');
